@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Jardin Virtuel — Atelier Mémoire</title>
+  <title>Jardin Virtuel</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -196,7 +196,25 @@
     <div id="hint">Touchez la terre pour planter</div>
   </div>
 
-  <footer>Atelier Mémoire &nbsp;·&nbsp; Jardin Virtuel</footer>
+  <footer></footer>
+
+  <a href="https://pierreg78-maker.github.io/Atelier/" style="
+    display: inline-block;
+    margin-top: 16px;
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #5a9a30, #3d7020);
+    color: #f0f8e0;
+    text-decoration: none;
+    border-radius: 30px;
+    font-family: Georgia, serif;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+  "
+  onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,0.4)'"
+  onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(0,0,0,0.35)'"
+  >🌿 Retour à l'Atelier Mémoire</a>
 
   <script>
   (function(){
@@ -205,7 +223,7 @@
     const flowersC=document.getElementById('flowers-c'),creatC=document.getElementById('creatures-c');
     const msgEl=document.getElementById('msg'),tlbl=document.getElementById('tlbl'),clbl=document.getElementById('clbl'),hint=document.getElementById('hint');
     const musicBtn=document.getElementById('music-btn');
-    let flowerCount=0,audioCtx=null,musicOn=false;
+    let flowerCount=0,audioCtx=null,musicOn=false,musicTimer=null;
 
     /* ── MUSIQUE procédurale (Web Audio API, aucun droit) ── */
     function noteFreq(s){return 261.63*Math.pow(2,s/12);}
@@ -229,13 +247,19 @@
       const beatLen=1.2;
       melody.forEach((n,i)=>playNote(audioCtx,noteFreq(n),now+i*beatLen,beatLen*0.85,0.07));
       [0,7,5,7].forEach((r,i)=>playChord(audioCtx,r,now+i*beatLen*4));
-      setTimeout(()=>{if(musicOn)scheduleMusic();},melody.length*beatLen*1000-200);
+      musicTimer=setTimeout(()=>{if(musicOn)scheduleMusic();},melody.length*beatLen*1000-200);
     }
     musicBtn.addEventListener('click',()=>{
       if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
       musicOn=!musicOn;
       musicBtn.textContent=musicOn?'🔇 Silence':'🎵 Musique';
-      if(musicOn)scheduleMusic();
+      if(musicOn){
+        scheduleMusic();
+      } else {
+        clearTimeout(musicTimer);
+        musicTimer=null;
+        audioCtx.suspend();
+      }
     });
 
     /* ── CYCLE JOUR/NUIT ── */
