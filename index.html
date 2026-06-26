@@ -196,7 +196,7 @@
     <div id="hint">Touchez la terre pour planter</div>
   </div>
 
-  <footer>Atelier Mémoire &nbsp;·&nbsp; Jardin Virtuel</footer>
+  <footer></footer>
 
   <a href="https://pierreg78-maker.github.io/Atelier/" style="
     display: inline-block;
@@ -250,7 +250,9 @@
       [0,7,5,7].forEach((r,i)=>playChord(ctx,r,now+i*beatLen*4));
       musicTimer=setTimeout(()=>scheduleMusic(gen),melody.length*beatLen*1000-200);
     }
-    musicBtn.addEventListener('click',()=>{
+    function toggleMusic(e){
+      e.preventDefault();
+      e.stopPropagation();
       musicOn=!musicOn;
       musicBtn.textContent=musicOn?'🔇 Silence':'🎵 Musique';
       if(musicOn){
@@ -263,7 +265,9 @@
         clearTimeout(musicTimer);
         musicTimer=null;
       }
-    });
+    }
+    musicBtn.addEventListener('click', toggleMusic);
+    musicBtn.addEventListener('touchend', toggleMusic);
 
     /* ── CYCLE JOUR/NUIT ── */
     const times=[
