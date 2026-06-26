@@ -1,127 +1,456 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jardin Virtuel</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap');
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #e0f7e9, #f0f8ff, #fff0f5);
-            color: #333;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .container {
-            max-width: 700px;
-            padding: 20px;
-        }
-
-        h1 {
-            font-size: 2.8rem;
-            color: #2e8b57;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            font-size: 1.4rem;
-            color: #555;
-            margin-bottom: 50px;
-        }
-
-        .icons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 40px;
-            margin: 40px 0;
-        }
-
-        .icon {
-            font-size: 5.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .icon:hover {
-            transform: scale(1.2);
-        }
-
-        .dog {
-            font-size: 6rem;
-            margin-bottom: 20px;
-        }
-
-        .message {
-            font-size: 1.5rem;
-            color: #2e8b57;
-            background: rgba(255,255,255,0.8);
-            padding: 20px 40px;
-            border-radius: 30px;
-            display: inline-block;
-            margin: 20px 0 50px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 14px 35px;
-            background: #6b7280;
-            color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-        }
-
-        .back-btn:hover {
-            background: #4b5563;
-            transform: scale(1.05);
-        }
-
-        footer {
-            margin-top: 60px;
-            color: #888;
-            font-size: 0.95rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Jardin Virtuel — Atelier Mémoire</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1a2a10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: Georgia, serif;
+      padding: 12px;
+    }
+    h1 {
+      color: #d4e8a0;
+      font-size: clamp(18px, 3vw, 26px);
+      font-weight: normal;
+      letter-spacing: 0.04em;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    #gw {
+      position: relative;
+      width: 100%;
+      max-width: 780px;
+      height: clamp(380px, 58vw, 540px);
+      overflow: hidden;
+      border-radius: 20px;
+      cursor: crosshair;
+      user-select: none;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    }
+    #sky { position: absolute; inset: 0; }
+    #sun { position: absolute; border-radius: 50%; transition: all 4s ease; pointer-events: none; }
+    #stars-c { position: absolute; inset: 0; opacity: 0; transition: opacity 3s; pointer-events: none; }
+    #clouds-c, #flowers-c, #creatures-c { position: absolute; inset: 0; pointer-events: none; }
+    #msg {
+      position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.9); color: #3a3020;
+      border-radius: 28px; padding: 8px 24px;
+      font-size: clamp(14px, 2.5vw, 17px); font-weight: bold;
+      text-align: center; pointer-events: none;
+      transition: opacity 0.6s; white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    #tlbl {
+      position: absolute; top: 14px; right: 14px;
+      background: rgba(255,255,255,0.78); color: #3a3020;
+      border-radius: 20px; padding: 5px 14px; font-size: 13px; pointer-events: none;
+    }
+    #clbl {
+      position: absolute; top: 14px; left: 14px;
+      background: rgba(255,255,255,0.78); color: #3a3020;
+      border-radius: 20px; padding: 5px 14px; font-size: 13px; pointer-events: none;
+    }
+    #music-btn {
+      position: absolute; bottom: 14px; right: 14px;
+      background: rgba(255,255,255,0.88); color: #3a3020;
+      border: none; border-radius: 20px; padding: 7px 18px;
+      font-size: 14px; cursor: pointer; pointer-events: all; z-index: 10;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+      font-family: Georgia, serif;
+    }
+    #music-btn:hover { background: rgba(255,255,255,1); }
+    #hint {
+      position: absolute; bottom: 14%;
+      left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.88); font-size: clamp(13px, 2vw, 15px);
+      pointer-events: none; text-align: center; transition: opacity 1.2s;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .flower, .creature { position: absolute; pointer-events: none; }
+    .star { position: absolute; border-radius: 50%; background: white; pointer-events: none; }
+    footer {
+      color: rgba(180,210,140,0.7); font-size: 12px;
+      margin-top: 10px; text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌿 Jardin Virtuel</h1>
-        <p class="subtitle">Un espace de calme et de verdure</p>
+  <h1>🌸 Mon Jardin Virtuel</h1>
 
-        <!-- Chien -->
-        <div class="dog">🐶</div>
-        <div class="message">
-            Le jardin sera bientôt ouvert !
-        </div>
+  <div id="gw">
+    <div id="sky"></div>
+    <div id="sun"></div>
+    <div id="stars-c"></div>
+    <div id="clouds-c"></div>
 
-        <!-- Icônes plantes et arbre -->
-        <div class="icons">
-            <div class="icon">🌷</div>
-            <div class="icon">🌻</div>
-            <div class="icon">🌿</div>
-            <div class="icon">🌳</div>
-        </div>
+    <svg id="landscape" viewBox="0 0 680 260" preserveAspectRatio="none"
+         width="100%" height="260" style="position:absolute;bottom:0;pointer-events:none;">
+      <defs>
+        <linearGradient id="h1g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4a7a2a"/><stop offset="100%" stop-color="#3d6020"/>
+        </linearGradient>
+        <linearGradient id="h2g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#5a8a35"/><stop offset="100%" stop-color="#4a7228"/>
+        </linearGradient>
+        <linearGradient id="h3g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6a9a40"/><stop offset="100%" stop-color="#5a8830"/>
+        </linearGradient>
+        <linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#8b5e3c"/><stop offset="100%" stop-color="#6b4425"/>
+        </linearGradient>
+      </defs>
 
-        <!-- Bouton retour -->
-        <a href="https://pierreg78-maker.github.io/Atelier/" class="back-btn">
-            ← Retour à l'Atelier Mémoire
-        </a>
-    </div>
+      <!-- Collines lointaines -->
+      <path d="M0 145 Q60 100 130 118 Q200 95 270 110 Q340 90 410 108 Q480 92 550 112 Q620 98 680 115 L680 260 L0 260 Z" fill="url(#h1g)" opacity="0.55"/>
+      <!-- Collines mid -->
+      <path d="M0 165 Q80 128 160 148 Q230 125 310 142 Q380 120 450 140 Q530 122 610 145 Q650 135 680 142 L680 260 L0 260 Z" fill="url(#h2g)" opacity="0.75"/>
 
-    <footer>
-        <p>Atelier Artistique — Revenez bientôt pour cultiver votre jardin 🌱</p>
-    </footer>
+      <!-- Maison fond gauche : cx=69 -->
+      <g opacity="0.82">
+        <rect x="58" y="127" width="22" height="16" fill="#d4a96a"/>
+        <polygon points="52,127 80,127 66,113" fill="#c0392b"/>
+        <rect x="64" y="133" width="6" height="10" fill="#8b6340"/>
+        <rect x="58" y="129" width="5" height="5" fill="#87CEEB" opacity="0.7"/>
+      </g>
+      <!-- Maison fond droite + tour : cx=553 -->
+      <g opacity="0.78">
+        <rect x="538" y="118" width="30" height="18" fill="#e8c98a"/>
+        <polygon points="530,118 576,118 553,102" fill="#922b21"/>
+        <rect x="550" y="125" width="7" height="11" fill="#7a5430"/>
+        <rect x="540" y="121" width="6" height="6" fill="#87CEEB" opacity="0.7"/>
+        <rect x="561" y="112" width="8" height="24" fill="#d4a96a"/>
+        <polygon points="555,112 575,112 565,103" fill="#a93226"/>
+      </g>
+      <!-- Maison fond centre : cx=305 -->
+      <g opacity="0.72">
+        <rect x="295" y="108" width="20" height="15" fill="#c9b89a"/>
+        <polygon points="288,108 322,108 305,96" fill="#7d6608"/>
+        <rect x="301" y="114" width="5" height="9" fill="#7a5430"/>
+      </g>
+      <!-- Clocher -->
+      <rect x="385" y="100" width="10" height="20" fill="#c8b89a" opacity="0.65"/>
+      <polygon points="383,100 397,100 390,91" fill="#7a6010" opacity="0.65"/>
+      <rect x="388" y="91" width="4" height="5" fill="#c8b89a" opacity="0.6"/>
+      <!-- Arbres fond -->
+      <ellipse cx="105" cy="120" rx="14" ry="18" fill="#3a6b1a" opacity="0.6"/>
+      <rect x="103" y="128" width="4" height="12" fill="#6b4425" opacity="0.6"/>
+      <ellipse cx="490" cy="114" rx="12" ry="15" fill="#2d5a14" opacity="0.55"/>
+      <rect x="488" y="122" width="4" height="10" fill="#6b4425" opacity="0.55"/>
+
+      <!-- Colline avant-plan -->
+      <path d="M0 188 Q90 155 180 175 Q270 148 370 170 Q460 150 560 172 Q620 158 680 168 L680 260 L0 260 Z" fill="url(#h3g)" opacity="0.9"/>
+
+      <!-- Arbres mi-plan -->
+      <ellipse cx="42" cy="178" rx="18" ry="24" fill="#2d6b12"/>
+      <rect x="39" y="190" width="6" height="18" fill="#6b4425"/>
+      <ellipse cx="618" cy="172" rx="16" ry="21" fill="#326314"/>
+      <rect x="615" y="183" width="6" height="16" fill="#6b4425"/>
+      <ellipse cx="140" cy="168" rx="8" ry="20" fill="#3a7820"/>
+      <rect x="137" y="182" width="6" height="16" fill="#6b4425"/>
+      <ellipse cx="555" cy="163" rx="8" ry="20" fill="#37701e"/>
+      <rect x="552" y="177" width="6" height="16" fill="#6b4425"/>
+
+      <!-- Maison avant gauche : murs x=172..212, cx=192, toit centré -->
+      <g>
+        <rect x="172" y="178" width="40" height="28" fill="#e8d0a0"/>
+        <polygon points="164,178 220,178 192,160" fill="#b03a2e"/>
+        <rect x="184" y="188" width="10" height="18" fill="#8b5a30" rx="2"/>
+        <rect x="174" y="181" width="9" height="9" fill="#87CEEB" opacity="0.8" rx="1"/>
+        <rect x="197" y="181" width="9" height="9" fill="#87CEEB" opacity="0.8" rx="1"/>
+        <rect x="173" y="181" width="3" height="9" fill="#8b7355"/>
+        <rect x="183" y="181" width="3" height="9" fill="#8b7355"/>
+      </g>
+      <!-- Maison avant droite : murs x=469..511, cx=490, toit centré -->
+      <g>
+        <rect x="469" y="174" width="42" height="30" fill="#d4c4a0"/>
+        <polygon points="460,174 520,174 490,155" fill="#922b21"/>
+        <rect x="482" y="185" width="10" height="19" fill="#7a5030" rx="2"/>
+        <rect x="471" y="177" width="9" height="9" fill="#87CEEB" opacity="0.8" rx="1"/>
+        <rect x="498" y="177" width="9" height="9" fill="#87CEEB" opacity="0.8" rx="1"/>
+        <rect x="470" y="177" width="3" height="9" fill="#8b7355"/>
+        <rect x="480" y="177" width="3" height="9" fill="#8b7355"/>
+        <!-- Cheminée centrée sur le toit -->
+        <rect x="486" y="157" width="7" height="14" fill="#c9a880"/>
+        <rect x="484" y="155" width="11" height="4" fill="#b8956a" rx="1"/>
+      </g>
+
+      <!-- Sol / jardin premier plan -->
+      <path d="M0 215 Q170 205 340 212 Q510 205 680 215 L680 260 L0 260 Z" fill="url(#sg)"/>
+      <path d="M0 214 Q170 204 340 211 Q510 204 680 214" fill="none" stroke="#5a9a25" stroke-width="4"/>
+    </svg>
+
+    <div id="flowers-c"></div>
+    <div id="creatures-c"></div>
+    <div id="msg">Touchez le jardin pour faire pousser une fleur 🌸</div>
+    <div id="tlbl">☀️ Matin</div>
+    <div id="clbl">🌸 0 fleur</div>
+    <button id="music-btn">🎵 Musique</button>
+    <div id="hint">Touchez la terre pour planter</div>
+  </div>
+
+  <footer>Atelier Mémoire &nbsp;·&nbsp; Jardin Virtuel</footer>
+
+  <script>
+  (function(){
+    const wrap=document.getElementById('gw'),sky=document.getElementById('sky'),sunEl=document.getElementById('sun');
+    const starsC=document.getElementById('stars-c'),cloudsC=document.getElementById('clouds-c');
+    const flowersC=document.getElementById('flowers-c'),creatC=document.getElementById('creatures-c');
+    const msgEl=document.getElementById('msg'),tlbl=document.getElementById('tlbl'),clbl=document.getElementById('clbl'),hint=document.getElementById('hint');
+    const musicBtn=document.getElementById('music-btn');
+    let flowerCount=0,audioCtx=null,musicOn=false;
+
+    /* ── MUSIQUE procédurale (Web Audio API, aucun droit) ── */
+    function noteFreq(s){return 261.63*Math.pow(2,s/12);}
+    function playNote(ctx,freq,start,dur,vol){
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='sine'; o.frequency.value=freq;
+      g.gain.setValueAtTime(0,start);
+      g.gain.linearRampToValueAtTime(vol,start+0.08);
+      g.gain.linearRampToValueAtTime(vol*0.6,start+dur*0.6);
+      g.gain.linearRampToValueAtTime(0,start+dur);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(start); o.stop(start+dur+0.05);
+    }
+    function playChord(ctx,root,start){
+      [0,4,7].forEach(d=>playNote(ctx,noteFreq(root+d),start,2.5,0.04));
+    }
+    function scheduleMusic(){
+      if(!audioCtx||!musicOn)return;
+      const now=audioCtx.currentTime;
+      const melody=[0,2,4,7,9,12,9,7,4,2,0,4,7,4,2];
+      const beatLen=1.2;
+      melody.forEach((n,i)=>playNote(audioCtx,noteFreq(n),now+i*beatLen,beatLen*0.85,0.07));
+      [0,7,5,7].forEach((r,i)=>playChord(audioCtx,r,now+i*beatLen*4));
+      setTimeout(()=>{if(musicOn)scheduleMusic();},melody.length*beatLen*1000-200);
+    }
+    musicBtn.addEventListener('click',()=>{
+      if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      musicOn=!musicOn;
+      musicBtn.textContent=musicOn?'🔇 Silence':'🎵 Musique';
+      if(musicOn)scheduleMusic();
+    });
+
+    /* ── CYCLE JOUR/NUIT ── */
+    const times=[
+      {name:'🌅 Aube',      s1:'#FFB347',s2:'#FF8C69',sun:'#FFD700',glow:'rgba(255,180,0,0.4)', moon:null},
+      {name:'☀️ Matin',     s1:'#87CEEB',s2:'#4FC3F7',sun:'#FFD700',glow:'rgba(255,220,0,0.5)', moon:null},
+      {name:'🌤️ Après-midi',s1:'#5BB8F5',s2:'#2E86C1',sun:'#FFF176',glow:'rgba(255,240,100,0.4)',moon:null},
+      {name:'🌇 Coucher',   s1:'#FF8C42',s2:'#C0392B',sun:'#FF8C00',glow:'rgba(255,80,0,0.5)',  moon:null},
+      {name:'🌙 Nuit',      s1:'#1A1A4E',s2:'#0D0D2B',sun:null,     glow:null,                  moon:'#F5F5DC'},
+    ];
+    let curTime=1,simTime=8;
+
+    function applyTime(idx){
+      const t=times[idx];
+      sky.style.cssText=`position:absolute;inset:0;background:linear-gradient(to bottom,${t.s1},${t.s2});transition:background 4s;`;
+      tlbl.textContent=t.name;
+      if(t.moon){
+        sunEl.style.cssText=`position:absolute;width:48px;height:48px;border-radius:50%;background:${t.moon};box-shadow:0 0 18px 6px rgba(200,200,255,0.3);left:80%;top:50px;transition:all 4s;pointer-events:none;`;
+        starsC.style.opacity='1';
+      } else {
+        const prog=idx/3,lft=10+prog*70,tp=idx===3?70:20+Math.sin(prog*Math.PI)*(-40);
+        sunEl.style.cssText=`position:absolute;width:52px;height:52px;border-radius:50%;background:${t.sun};box-shadow:0 0 28px 10px ${t.glow};left:${lft}%;top:${tp}px;transition:all 4s;pointer-events:none;`;
+        starsC.style.opacity='0';
+      }
+      Array.from(cloudsC.children).forEach(c=>c.style.opacity=idx<4?'0.9':'0.1');
+    }
+
+    /* ── ÉTOILES ── */
+    function createStars(){
+      starsC.style.cssText='position:absolute;inset:0;opacity:0;transition:opacity 3s;pointer-events:none;';
+      for(let i=0;i<60;i++){
+        const s=document.createElement('div');
+        const sz=Math.random()*2.5+1;
+        s.style.cssText=`position:absolute;width:${sz}px;height:${sz}px;top:${Math.random()*55}%;left:${Math.random()*100}%;opacity:${Math.random()*0.8+0.2};border-radius:50%;background:white;`;
+        starsC.appendChild(s);
+      }
+    }
+
+    /* ── NUAGES ── */
+    function createCloud(){
+      const el=document.createElement('div');
+      const top=3+Math.random()*22,scale=0.7+Math.random()*0.8;
+      el.style.cssText=`position:absolute;top:${top}%;left:-180px;pointer-events:none;transform:scale(${scale});opacity:0.88;`;
+      el.innerHTML=`<svg viewBox="0 0 140 60" width="140" height="60"><ellipse cx="70" cy="40" rx="60" ry="22" fill="white" opacity="0.9"/><ellipse cx="45" cy="35" rx="32" ry="22" fill="white" opacity="0.95"/><ellipse cx="90" cy="32" rx="28" ry="20" fill="white" opacity="0.9"/><ellipse cx="68" cy="28" rx="22" ry="18" fill="white"/></svg>`;
+      cloudsC.appendChild(el);
+      const dur=35000+Math.random()*40000,ww=wrap.offsetWidth+200;
+      let st=null;
+      (function anim(ts){if(!st)st=ts;const p=(ts-st)/dur;if(p>=1){el.remove();return;}el.style.left=(-180+p*(ww+180))+'px';requestAnimationFrame(anim);})();
+    }
+
+    /* ── FLEURS ── */
+    const palettes=[
+      {p:'#FF6B9D',c:'#FFD700'},{p:'#FFD93D',c:'#FF6B35'},{p:'#C8A8E9',c:'#FFD700'},
+      {p:'#6BCB77',c:'#FFD93D'},{p:'#FF9A3C',c:'#FFF'},   {p:'#4FC3F7',c:'#FFD700'},
+      {p:'#F48FB1',c:'#FFF176'},{p:'#ABEBC6',c:'#FF8A65'},
+    ];
+    const flowerMsgs=[
+      "Comme c'est beau ! 🌸","Quelle jolie fleur !","Votre jardin s'épanouit 🌼",
+      "Merveilleux !","Une fleur pleine de douceur 💛","Bravo, quel talent !",
+      "La nature vous sourit 🌷","Chaque fleur est un cadeau 🎁","Magnifique ! 🌺","Que c'est joli !",
+    ];
+
+    function createFlower(x,relY){
+      flowerCount++;
+      clbl.textContent=`🌸 ${flowerCount} fleur${flowerCount>1?'s':''}`;
+      hint.style.opacity='0';
+      const pal=palettes[Math.floor(Math.random()*palettes.length)];
+      const h=55+Math.random()*50,pc=5+Math.floor(Math.random()*4),ps=8+Math.random()*8;
+      const sw=2+Math.random()*4,ss=2+Math.random()*3,so=Math.random()*Math.PI*2;
+      const el=document.createElement('div');
+      const soilH=wrap.offsetHeight-relY;
+      el.style.cssText=`position:absolute;left:${x}px;bottom:${soilH-10}px;width:${ps*2+4}px;transform-origin:bottom center;transform:scaleY(0);pointer-events:none;`;
+      let petals='';
+      for(let i=0;i<pc;i++){const a=(i/pc)*360;petals+=`<ellipse cx="0" cy="${-(ps+2)}" rx="${ps*0.55}" ry="${ps}" fill="${pal.p}" opacity="0.92" transform="rotate(${a})"/>`;}
+      el.innerHTML=`<svg viewBox="${-ps*2-4} ${-h} ${ps*4+8} ${h+ps*2+8}" width="${ps*2+4}" style="overflow:visible"><path d="M0 0 Q${-ps*0.5} ${-h*0.5} 0 ${-h}" stroke="#5a9a2a" stroke-width="2" fill="none" stroke-linecap="round"/><g transform="translate(0,${-h})">${petals}<circle cx="0" cy="0" r="${ps*0.45}" fill="${pal.c}"/></g></svg>`;
+      flowersC.appendChild(el);
+      let sc=0;
+      (function grow(){sc=Math.min(1,sc+0.035);el.style.transform=`scaleY(${sc})`;if(sc<1)requestAnimationFrame(grow);})();
+      let t=so;
+      setTimeout(()=>{(function sway(){t+=0.016;el.style.transform=`rotate(${Math.sin(t/ss)*sw}deg)`;requestAnimationFrame(sway);})();},1400);
+      showMsg(flowerMsgs[Math.floor(Math.random()*flowerMsgs.length)]);
+      if(flowerCount%3===0&&creatC.querySelectorAll('.butterfly').length<4)setTimeout(createButterfly,800);
+    }
+
+    /* ── CRÉATURES ── */
+    function animFloat(el,sx,sy,vx,vy,life,zigzag){
+      let bx=sx,by=sy,t=Math.random()*Math.PI*2,fr;
+      const dvx=(Math.random()-0.5)*vx*2,dvy=(Math.random()-0.5)*vy*2;
+      function move(){
+        t+=0.07;
+        bx+=dvx+(zigzag?Math.sin(t*2.5)*0.02:Math.sin(t*0.7)*0.014);
+        by+=dvy+Math.sin(t*(zigzag?1.8:1.1))*0.01;
+        if(bx<1||bx>95||by<3||by>65){el.remove();return;}
+        el.style.left=bx+'%'; el.style.top=by+'%';
+        if(!zigzag)el.style.transform=`scaleX(${Math.cos(t*4)>0?1:-1})`;
+        fr=requestAnimationFrame(move);
+      }
+      fr=requestAnimationFrame(move);
+      setTimeout(()=>{cancelAnimationFrame(fr);el.remove();},life);
+    }
+
+    function createButterfly(){
+      const el=document.createElement('div');el.className='butterfly creature';
+      const sx=10+Math.random()*80,sy=12+Math.random()*38;
+      const cols=['#FF6B9D','#C8A8E9','#4FC3F7','#FFD93D','#6BCB77'];
+      const c=cols[Math.floor(Math.random()*cols.length)];
+      el.style.cssText=`position:absolute;left:${sx}%;top:${sy}%;pointer-events:none;`;
+      el.innerHTML=`<svg viewBox="0 0 40 30" width="36" height="27">
+        <ellipse cx="10" cy="12" rx="9" ry="7" fill="${c}" opacity="0.82" transform="rotate(-20,10,12)"/>
+        <ellipse cx="30" cy="12" rx="9" ry="7" fill="${c}" opacity="0.82" transform="rotate(20,30,12)"/>
+        <ellipse cx="12" cy="20" rx="6" ry="5" fill="${c}" opacity="0.6" transform="rotate(-35,12,20)"/>
+        <ellipse cx="28" cy="20" rx="6" ry="5" fill="${c}" opacity="0.6" transform="rotate(35,28,20)"/>
+        <rect x="19" y="8" width="2" height="16" rx="1" fill="#5a3010"/>
+        <path d="M19 8 Q14 2 18 0 M21 8 Q26 2 22 0" stroke="#5a3010" stroke-width="0.8" fill="none"/>
+      </svg>`;
+      creatC.appendChild(el);
+      animFloat(el,sx,sy,0.025,0.012,12000+Math.random()*8000,false);
+    }
+
+    function createBee(){
+      const el=document.createElement('div');el.className='bee creature';
+      const sx=15+Math.random()*70,sy=30+Math.random()*40;
+      el.style.cssText=`position:absolute;left:${sx}%;top:${sy}%;pointer-events:none;`;
+      el.innerHTML=`<svg viewBox="0 0 28 20" width="26" height="18">
+        <ellipse cx="14" cy="12" rx="8" ry="6" fill="#FFD700"/>
+        <rect x="9"  y="10" width="3" height="5" rx="1" fill="#2d2d00" opacity="0.85"/>
+        <rect x="14" y="10" width="3" height="5" rx="1" fill="#2d2d00" opacity="0.85"/>
+        <rect x="19" y="10" width="3" height="5" rx="1" fill="#2d2d00" opacity="0.85"/>
+        <ellipse cx="20" cy="12" rx="5" ry="5" fill="#FFD700"/>
+        <ellipse cx="24" cy="11" rx="3" ry="1.5" fill="#111" opacity="0.7"/>
+        <ellipse cx="11" cy="7" rx="6" ry="3" fill="white" opacity="0.65" transform="rotate(-20,11,7)"/>
+        <ellipse cx="18" cy="6" rx="6" ry="3" fill="white" opacity="0.65" transform="rotate(20,18,6)"/>
+        <circle cx="22" cy="10" r="2" fill="#1a1a00"/>
+      </svg>`;
+      creatC.appendChild(el);
+      animFloat(el,sx,sy,0.04,0.03,9000+Math.random()*6000,true);
+    }
+
+    function createDragonfly(){
+      const el=document.createElement('div');el.className='dragonfly creature';
+      const sx=5+Math.random()*85,sy=8+Math.random()*42;
+      const hue=['#4FC3F7','#80CBC4','#A5D6A7','#CE93D8'][Math.floor(Math.random()*4)];
+      el.style.cssText=`position:absolute;left:${sx}%;top:${sy}%;pointer-events:none;`;
+      el.innerHTML=`<svg viewBox="0 0 52 24" width="50" height="22">
+        <ellipse cx="26" cy="13" rx="14" ry="4" fill="${hue}" opacity="0.9"/>
+        <ellipse cx="36" cy="13" rx="6" ry="2.5" fill="${hue}" opacity="0.7"/>
+        <ellipse cx="42" cy="13" rx="4" ry="1.5" fill="${hue}" opacity="0.5"/>
+        <ellipse cx="12" cy="8"  rx="13" ry="5" fill="white" opacity="0.55" transform="rotate(-8,12,8)"/>
+        <ellipse cx="40" cy="8"  rx="13" ry="5" fill="white" opacity="0.55" transform="rotate(8,40,8)"/>
+        <ellipse cx="12" cy="18" rx="13" ry="5" fill="white" opacity="0.45" transform="rotate(8,12,18)"/>
+        <ellipse cx="40" cy="18" rx="13" ry="5" fill="white" opacity="0.45" transform="rotate(-8,40,18)"/>
+        <circle cx="19" cy="12" r="3" fill="#1a3a5a"/>
+        <circle cx="20" cy="11" r="1" fill="white" opacity="0.7"/>
+      </svg>`;
+      creatC.appendChild(el);
+      animFloat(el,sx,sy,0.055,0.03,10000+Math.random()*7000,false);
+    }
+
+    function createBird(){
+      const el=document.createElement('div');el.className='bird creature';
+      const sy=5+Math.random()*28,fromRight=Math.random()>0.5;
+      const sx=fromRight?105:-10;
+      el.style.cssText=`position:absolute;left:${sx}%;top:${sy}%;pointer-events:none;`;
+      const col=['#555','#7a6040','#334'][Math.floor(Math.random()*3)];
+      el.innerHTML=`<svg viewBox="0 0 36 16" width="34" height="14">
+        <path d="M18 8 Q10 2 2 6"  stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <path d="M18 8 Q26 2 34 6" stroke="${col}" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <ellipse cx="18" cy="9" rx="3" ry="2" fill="${col}"/>
+      </svg>`;
+      creatC.appendChild(el);
+      const dir=fromRight?-1:1,speed=0.06+Math.random()*0.04,vy=(Math.random()-0.5)*0.012;
+      let bx=sx,by=sy,t=0,fr;
+      el.style.transform=fromRight?'scaleX(-1)':'scaleX(1)';
+      function fly(){t+=0.08;bx+=dir*speed;by+=vy+Math.sin(t*0.7)*0.008;el.style.left=bx+'%';el.style.top=by+'%';if(bx<-15||bx>115){el.remove();return;}fr=requestAnimationFrame(fly);}
+      fr=requestAnimationFrame(fly);
+    }
+
+    /* ── UI ── */
+    function showMsg(txt){
+      msgEl.textContent=txt;msgEl.style.opacity='1';
+      clearTimeout(msgEl._t);msgEl._t=setTimeout(()=>msgEl.style.opacity='0',3200);
+    }
+
+    function handlePlant(cx,cy){
+      const rect=wrap.getBoundingClientRect();
+      const relY=cy-rect.top,relX=cx-rect.left;
+      if(relY>wrap.offsetHeight*0.78) createFlower(relX-12,relY);
+      else showMsg('Touchez la terre brune pour planter 🌱');
+    }
+    wrap.addEventListener('click',e=>handlePlant(e.clientX,e.clientY));
+    wrap.addEventListener('touchstart',e=>{e.preventDefault();handlePlant(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+
+    /* ── INIT ── */
+    createStars();
+    for(let i=0;i<3;i++)setTimeout(()=>createCloud(),i*5000);
+    setInterval(()=>createCloud(),18000);
+    applyTime(curTime);
+    setInterval(()=>{
+      simTime=(simTime+1)%24;
+      const idx=simTime<6?0:simTime<12?1:simTime<17?2:simTime<20?3:4;
+      if(idx!==curTime){curTime=idx;applyTime(idx);}
+    },8000);
+
+    setTimeout(createButterfly,3000); setTimeout(createButterfly,7000);
+    setTimeout(createBee,5000);       setTimeout(createBee,11000);
+    setTimeout(createDragonfly,9000);
+    setTimeout(createBird,4000);      setTimeout(createBird,14000);
+    setInterval(()=>{
+      const r=Math.random();
+      if(r<0.35)createButterfly();
+      else if(r<0.6)createBee();
+      else if(r<0.8)createDragonfly();
+      else createBird();
+    },7000);
+  })();
+  </script>
 </body>
 </html>
