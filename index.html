@@ -196,7 +196,7 @@
     <div id="hint">Touchez la terre pour planter</div>
   </div>
 
-  <footer></footer>
+  <footer>Atelier Mémoire &nbsp;·&nbsp; Jardin Virtuel</footer>
 
   <a href="https://pierreg78-maker.github.io/Atelier/" style="
     display: inline-block;
@@ -223,42 +223,45 @@
     const flowersC=document.getElementById('flowers-c'),creatC=document.getElementById('creatures-c');
     const msgEl=document.getElementById('msg'),tlbl=document.getElementById('tlbl'),clbl=document.getElementById('clbl'),hint=document.getElementById('hint');
     const musicBtn=document.getElementById('music-btn');
-    let flowerCount=0,audioCtx=null,musicOn=false,musicTimer=null;
+    let flowerCount=0,audioCtx=null,musicOn=false,musicTimer=null,musicGen=0;
 
     /* ── MUSIQUE procédurale (Web Audio API, aucun droit) ── */
     function noteFreq(s){return 261.63*Math.pow(2,s/12);}
     function playNote(ctx,freq,start,dur,vol){
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.type='sine'; o.frequency.value=freq;
-      g.gain.setValueAtTime(0,start);
-      g.gain.linearRampToValueAtTime(vol,start+0.08);
-      g.gain.linearRampToValueAtTime(vol*0.6,start+dur*0.6);
-      g.gain.linearRampToValueAtTime(0,start+dur);
-      o.connect(g); g.connect(ctx.destination);
-      o.start(start); o.stop(start+dur+0.05);
+      try{
+        const o=ctx.createOscillator(),g=ctx.createGain();
+        o.type='sine'; o.frequency.value=freq;
+        g.gain.setValueAtTime(0,start);
+        g.gain.linearRampToValueAtTime(vol,start+0.08);
+        g.gain.linearRampToValueAtTime(vol*0.6,start+dur*0.6);
+        g.gain.linearRampToValueAtTime(0,start+dur);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(start); o.stop(start+dur+0.05);
+      }catch(e){}
     }
     function playChord(ctx,root,start){
       [0,4,7].forEach(d=>playNote(ctx,noteFreq(root+d),start,2.5,0.04));
     }
-    function scheduleMusic(){
-      if(!audioCtx||!musicOn)return;
-      const now=audioCtx.currentTime;
-      const melody=[0,2,4,7,9,12,9,7,4,2,0,4,7,4,2];
-      const beatLen=1.2;
-      melody.forEach((n,i)=>playNote(audioCtx,noteFreq(n),now+i*beatLen,beatLen*0.85,0.07));
-      [0,7,5,7].forEach((r,i)=>playChord(audioCtx,r,now+i*beatLen*4));
-      musicTimer=setTimeout(()=>{if(musicOn)scheduleMusic();},melody.length*beatLen*1000-200);
+    function scheduleMusic(gen){
+      if(!musicOn||gen!==musicGen)return;
+      const ctx=audioCtx,now=ctx.currentTime;
+      const melody=[0,2,4,7,9,12,9,7,4,2,0,4,7,4,2],beatLen=1.2;
+      melody.forEach((n,i)=>playNote(ctx,noteFreq(n),now+i*beatLen,beatLen*0.85,0.07));
+      [0,7,5,7].forEach((r,i)=>playChord(ctx,r,now+i*beatLen*4));
+      musicTimer=setTimeout(()=>scheduleMusic(gen),melody.length*beatLen*1000-200);
     }
     musicBtn.addEventListener('click',()=>{
-      if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
       musicOn=!musicOn;
       musicBtn.textContent=musicOn?'🔇 Silence':'🎵 Musique';
       if(musicOn){
-        scheduleMusic();
+        if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+        if(audioCtx.state==='suspended')audioCtx.resume();
+        musicGen++;
+        scheduleMusic(musicGen);
       } else {
+        musicGen++;
         clearTimeout(musicTimer);
         musicTimer=null;
-        audioCtx.suspend();
       }
     });
 
