@@ -254,7 +254,7 @@
       e.preventDefault();
       e.stopPropagation();
       musicOn=!musicOn;
-      musicBtn.textContent=musicOn?'🔇 Silence':'🎵 Musique';
+      musicBtn.textContent=musicOn?'🎵 Musique':'🎵 Musique';
       if(musicOn){
         if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
         if(audioCtx.state==='suspended')audioCtx.resume();
